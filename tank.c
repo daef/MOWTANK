@@ -45,15 +45,15 @@ void setupBT(int setupdelay) {
     sendBT("+STAUTO=0");            // auto connect forbidden
     sendBT("+STOAUT=1");            // permit paired device to connect me
     sendBT("+STPIN=1337");          // bluetooth pin 
-    delay(setupdelay);                   // This delay is required.
+    delay(setupdelay);              // This delay is required.
     sendBT("+INQ=1");               // enable inqure the device 
-    delay(setupdelay);                   // This delay is required.
+    delay(setupdelay);              // This delay is required.
 }
 
 void stopMotor(char mot) { setMotor(mot, STOP, 0); }
 
 void setMotor(char mot, char dir, int spd) {
-    analogWrite(MOTs[mot + 0], spd);
+    analogWrite (MOTs[mot + 0], spd);
     digitalWrite(MOTs[mot + 1], dir & 0x01);
     digitalWrite(MOTs[mot + 2], dir & 0x02);
 }
