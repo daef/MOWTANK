@@ -1,11 +1,7 @@
-#undef M_OWER
-
-#ifdef M_OWER
-
 #include <Servo.h> 
-#define HAXXXOR          6          //spinning wheel of death ^^ macfags
 
-#endif
+#define USBSERIAL 9600
+#define BTGPSRATE 38400
 
 #define SPDA             5          //Speed Control
 #define DIR1A            9          //Direction
@@ -15,9 +11,7 @@
 #define DIR2B           11          //Direction
 #define STANDBY         10          //Standby Pin
 #define STATUS_LED      13          //Led Pin
-
-#define USBSERIAL 9600
-#define BTGPSRATE 38400
+#define HAXXXOR          6          //spinning wheel of death ^^ macfags
 
 #define MOTA             0
 #define MOTB             3
@@ -36,10 +30,7 @@ cBBB => drive x y z
 
 */
 
-#ifdef
 Servo mower;
-#endif
-
 char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
 char x,y,z;
 char status = CMD_STOP;
@@ -49,10 +40,13 @@ char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read
 void sendBT(char command[]) {
     Serial1.println(command);
     Serial1.flush();
+    delay(42);
 }
 
 void setupBT(int setupdelay) {
-    sendBT("daef was here");
+    sendBT("daef");
+    sendBT("was");
+    sendBT("here");
     sendBT("+STWMOD=0");            // client mode
     sendBT("+STNA=m0wb0t");         // device name
     sendBT("+STAUTO=0");            // auto connect forbidden
@@ -79,7 +73,6 @@ void fullStop() {
     status = CMD_STOP;
 }
 
-#ifdef M_OWER
 void setupMower() {
     mower.write(0);
     delay(42);
@@ -87,7 +80,6 @@ void setupMower() {
     delay(42);
     mower.write(0);
 }
-#endif
 
 void setup() {
     pinMode( SPDA       , OUTPUT );
@@ -100,10 +92,8 @@ void setup() {
     pinMode( DIR2B      , OUTPUT );
     fullStop();                     //init's all previous outputs
     
-#ifdef M_OWER
     mower.attach(HAXXXOR);
     setupMower();
-#endif
 
     Serial.begin(USBSERIAL);        // init USB Serial (console)
     Serial1.begin(BTGPSRATE);       // init pin0/1 Serial (bluetooth)
@@ -128,14 +118,10 @@ void loop() {
         setMotor(MOTA, y, FORWARD);
         setMotor(MOTB, z, FORWARD);
         
-#ifdef M_OWER
         if((((y<0)?-y:y) + ((z<0)?-z:z)) > 10)
             runDelay = 3210;
-#endif
     }
-#ifdef M_OWER
     mower.write(runDelay?180:0);
     if(runDelay)
         --runDelay;
-#endif
 }
