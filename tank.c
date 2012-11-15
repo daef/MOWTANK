@@ -1,7 +1,11 @@
-#include <Servo.h> 
+#undef M_OWER
 
-#define USBSERIAL 9600
-#define BTGPSRATE 38400
+#ifdef M_OWER
+
+#include <Servo.h> 
+#define HAXXXOR          6          //spinning wheel of death ^^ macfags
+
+#endif
 
 #define SPDA             5          //Speed Control
 #define DIR1A            9          //Direction
@@ -11,7 +15,9 @@
 #define DIR2B           11          //Direction
 #define STANDBY         10          //Standby Pin
 #define STATUS_LED      13          //Led Pin
-#define HAXXXOR          6          //spinning wheel of death ^^ macfags
+
+#define USBSERIAL 9600
+#define BTGPSRATE 38400
 
 #define MOTA             0
 #define MOTB             3
@@ -20,8 +26,8 @@
 #define BACKWARD         2
 #define STOP             3
 
-#define CMD_DRIVE 'c'
-#define CMD_STOP 's'
+#define CMD_DRIVE       'c'
+#define CMD_STOP        's'
 
 
 /*
@@ -30,7 +36,10 @@ cBBB => drive x y z
 
 */
 
+#ifdef
 Servo mower;
+#endif
+
 char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
 char x,y,z;
 char status = CMD_STOP;
@@ -70,6 +79,7 @@ void fullStop() {
     status = CMD_STOP;
 }
 
+#ifdef M_OWER
 void setupMower() {
     mower.write(0);
     delay(42);
@@ -77,6 +87,7 @@ void setupMower() {
     delay(42);
     mower.write(0);
 }
+#endif
 
 void setup() {
     pinMode( SPDA       , OUTPUT );
@@ -89,13 +100,15 @@ void setup() {
     pinMode( DIR2B      , OUTPUT );
     fullStop();                     //init's all previous outputs
     
+#ifdef M_OWER
     mower.attach(HAXXXOR);
     setupMower();
+#endif
 
     Serial.begin(USBSERIAL);        // init USB Serial (console)
     Serial1.begin(BTGPSRATE);       // init pin0/1 Serial (bluetooth)
     delay(1234); 
-    setupBT(2345);
+    setupBT(3210);
     while(readBT() != CMD_STOP);    // safety frist? ¯\(°_o)/¯ I DUNNO LOL
 }
 
@@ -115,10 +128,14 @@ void loop() {
         setMotor(MOTA, y, FORWARD);
         setMotor(MOTB, z, FORWARD);
         
+#ifdef M_OWER
         if((((y<0)?-y:y) + ((z<0)?-z:z)) > 10)
             runDelay = 3210;
+#endif
     }
+#ifdef M_OWER
     mower.write(runDelay?180:0);
     if(runDelay)
         --runDelay;
+#endif
 }
