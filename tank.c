@@ -36,16 +36,16 @@ void sendBT(char command[]) {
     Serial1.flush();
 }
 
-void setupBT(int delay) {
+void setupBT(int setupdelay) {
     sendBT("daef was here");
     sendBT("+STWMOD=0");            // client mode
     sendBT("+STNA=m0wb0t");         // device name
     sendBT("+STAUTO=0");            // auto connect forbidden
     sendBT("+STOAUT=1");            // permit paired device to connect me
     sendBT("+STPIN=1337");          // bluetooth pin 
-    delay(delay);                   // This delay is required.
+    delay(setupdelay);                   // This delay is required.
     sendBT("+INQ=1");               // enable inqure the device 
-    delay(delay);                   // This delay is required.
+    delay(setupdelay);                   // This delay is required.
 }
 
 void stopMotor(char mot) { setMotor(mot, STOP, 0); }
