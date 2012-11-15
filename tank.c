@@ -39,17 +39,16 @@ char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read
 
 void sendBT(char command[]) {
     Serial1.println();
+    //Serial1.flush();
+    delay(250);
+    Serial1.print(command);
+    delay(250);
+    Serial1.println();
     Serial1.flush();
-    delay(234);
-    Serial1.println(command);
-    Serial1.flush();
-    delay(234);
+    delay(250);
 }
 
 void setupBT(int setupdelay) {
-    sendBT("daef");
-    sendBT("was");
-    sendBT("here");
     sendBT("+STWMOD=0");            // client mode
     sendBT("+STNA=m0wb0t");         // device name
     sendBT("+STAUTO=0");            // auto connect forbidden
