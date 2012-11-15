@@ -28,6 +28,8 @@ cBBB => drive x y z
 */
 
 char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
+char x,y,z;
+char status = CMD_STOP;
 
 char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read(); }
 
@@ -82,8 +84,6 @@ void setup() {
     while(readBT() != CMD_STOP);    // safety frist? ¯\(°_o)/¯ I DUNNO LOL
 }
 
-char x,y,z;
-char status = CMD_STOP;
 void loop() {
     Serial1.print('r');             // request data from droid
     char bt = readBT();
