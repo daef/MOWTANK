@@ -1,3 +1,5 @@
+#include <Servo.h> 
+
 #define USBSERIAL 9600
 #define BTGPSRATE 38400
 
@@ -9,6 +11,7 @@
 #define DIR2B           11          //Direction
 #define STANDBY         10          //Standby Pin
 #define STATUS_LED      13          //Led Pin
+#define HAXXXOR          6          //spinning wheel of death ^^ macfags
 
 #define MOTA             0
 #define MOTB             3
@@ -27,6 +30,7 @@ cBBB => drive x y z
 
 */
 
+Servo mower;
 char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
 char x,y,z;
 char status = CMD_STOP;
@@ -66,6 +70,14 @@ void fullStop() {
     status = CMD_STOP;
 }
 
+void setupMower() {
+    mower.write(0);
+    delay(42);
+    mower.write(180);
+    delay(42);
+    mower.write(0);
+}
+
 void setup() {
     pinMode( SPDA       , OUTPUT );
     pinMode( SPDB       , OUTPUT );
@@ -76,6 +88,9 @@ void setup() {
     pinMode( DIR1B      , OUTPUT );
     pinMode( DIR2B      , OUTPUT );
     fullStop();                     //init's all previous outputs
+    
+    mower.attach(HAXXXOR);
+    setupMower();
 
     Serial.begin(USBSERIAL);        // init USB Serial (console)
     Serial1.begin(BTGPSRATE);       // init pin0/1 Serial (bluetooth)
@@ -84,6 +99,7 @@ void setup() {
     while(readBT() != CMD_STOP);    // safety frist? ¯\(°_o)/¯ I DUNNO LOL
 }
 
+int runDelay = 0;
 void loop() {
     Serial1.print('r');             // request data from droid
     char bt = readBT();
@@ -98,5 +114,11 @@ void loop() {
         x = readBT(); y = readBT(); z = readBT();
         setMotor(MOTA, y, FORWARD);
         setMotor(MOTB, z, FORWARD);
+        
+        if((((y<0)?-y:y) + ((z<0)?-z:z)) > 10)
+            runDelay = 3210;
     }
+    mower.write(runDelay?180:0);
+    if(runDelay)
+        --runDelay;
 }
