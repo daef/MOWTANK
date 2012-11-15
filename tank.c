@@ -123,7 +123,7 @@ void loop() {
         if((((y<0)?-y:y) + ((z<0)?-z:z)) > 10)
             runDelay = 3210;
     }
-    mower.write(runDelay?180:0);
-    if(runDelay)
-        --runDelay;
+    //mower.write(runDelay?180:0);
+    //if(runDelay)
+    //    --runDelay;
 }
