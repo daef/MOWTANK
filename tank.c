@@ -27,7 +27,7 @@ cBBB => drive x y z
 
 */
 
-char[] MOTs = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
+char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
 
 char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read(); }
 
