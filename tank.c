@@ -38,9 +38,12 @@ char status = CMD_STOP;
 char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read(); }
 
 void sendBT(char command[]) {
+    Serial1.println();
+    Serial1.flush();
+    delay(234);
     Serial1.println(command);
     Serial1.flush();
-    delay(42);
+    delay(234);
 }
 
 void setupBT(int setupdelay) {
