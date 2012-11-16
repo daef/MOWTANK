@@ -1,5 +1,3 @@
-#include <Servo.h> 
-
 #define USBSERIAL 9600
 #define BTGPSRATE 38400
 
@@ -23,14 +21,6 @@
 #define CMD_DRIVE       'c'
 #define CMD_STOP        's'
 
-
-/*
-s => stop
-cBBB => drive x y z
-
-*/
-
-Servo mower;
 char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
 char x,y,z;
 char status = CMD_STOP;
@@ -39,7 +29,6 @@ char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read
 
 void sendBT(char command[]) {
     Serial1.println();
-    //Serial1.flush();
     delay(250);
     Serial1.print(command);
     delay(250);
@@ -75,14 +64,6 @@ void fullStop() {
     status = CMD_STOP;
 }
 
-void setupMower() {
-    mower.write(0);
-    delay(42);
-    mower.write(180);
-    delay(42);
-    mower.write(0);
-}
-
 void setup() {
     pinMode( SPDA       , OUTPUT );
     pinMode( SPDB       , OUTPUT );
@@ -94,9 +75,6 @@ void setup() {
     pinMode( DIR2B      , OUTPUT );
     fullStop();                     //init's all previous outputs
     
-    mower.attach(HAXXXOR);
-    setupMower();
-
     Serial.begin(USBSERIAL);        // init USB Serial (console)
     Serial1.begin(BTGPSRATE);       // init pin0/1 Serial (bluetooth)
     delay(1234); 
@@ -117,13 +95,13 @@ void loop() {
             digitalWrite(STATUS_LED, HIGH); // indicate status
         }
         x = readBT(); y = readBT(); z = readBT();
-        setMotor(MOTA, y, FORWARD);
-        setMotor(MOTB, z, FORWARD);
+        int l = z + y, r = z - y;
+        int L = (l < 0 ? -l : l)<<1;
+        int R = (r < 0 ? -r : r)<<1;
+        L = L > 255 ? 255 : L < 0 ? 0 : L;
+        R = R > 255 ? 255 : R < 0 ? 0 : R;
         
-        if((((y<0)?-y:y) + ((z<0)?-z:z)) > 10)
-            runDelay = 3210;
+        setMotor(MOTA, -l > 0 ? FORWARD : BACKWARD, L);
+        setMotor(MOTB, -r > 0 ? FORWARD : BACKWARD, R);
     }
-    //mower.write(runDelay?180:0);
-    //if(runDelay)
-    //    --runDelay;
 }
