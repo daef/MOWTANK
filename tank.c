@@ -9,7 +9,7 @@
 #define DIR2B           11          //Direction
 #define STANDBY         10          //Standby Pin
 #define STATUS_LED      13          //Led Pin
-#define HAXXXOR          6          //spinning wheel of death ^^ macfags
+#define HAXXXOR          6          //spinning wheel of death 
 
 #define MOTA             0
 #define MOTB             3
@@ -21,20 +21,24 @@
 #define CMD_DRIVE       'c'
 #define CMD_STOP        's'
 
+#include <SoftwareServo.h> 
+
+
 char MOTs[] = {SPDA, DIR1A, DIR2A, SPDB, DIR1B, DIR2B};
 char x,y,z;
 char status = CMD_STOP;
+SoftwareServo myservo;  // create servo object to control a servo 
 
-char readBT() { while(!Serial1.available()) delay(23); return (char)Serial1.read(); }
+char readBT() { while(!Serial1.available()) sdelay(20); return (char)Serial1.read(); }
 
 void sendBT(char command[]) {
     Serial1.println();
-    delay(250);
+    sdelay(250);
     Serial1.print(command);
-    delay(250);
+    sdelay(250);
     Serial1.println();
     Serial1.flush();
-    delay(250);
+    sdelay(250);
 }
 
 void setupBT(int setupdelay) {
@@ -54,6 +58,7 @@ void setMotor(char mot, char dir, int spd) {
     analogWrite (MOTs[mot + 0], spd);
     digitalWrite(MOTs[mot + 1], dir & 0x01);
     digitalWrite(MOTs[mot + 2], dir & 0x02);
+    myservo.write(spd/2);
 }
 
 void fullStop() {
@@ -61,7 +66,41 @@ void fullStop() {
     digitalWrite(STATUS_LED, LOW); // indicate status
     stopMotor(MOTA);
     stopMotor(MOTB);
+    myservo.write(0);
+    SoftwareServo::refresh();
     status = CMD_STOP;
+}
+
+void sdelay(int servodelay)
+  {
+    unsigned long previousMillis = 0; // last time update
+    int sloop = 0;
+    for (sloop = 0; sloop < servodelay; sloop +=1)
+      {
+        unsigned long currentMillis = millis();  
+          if(currentMillis - previousMillis > 40) {  
+           previousMillis = currentMillis;  
+           SoftwareServo::refresh();  // keep the softservo pbm alive 
+           }
+        delay(1);
+      }
+  }
+  
+void initservo() {
+    int pos = 0;   
+    for(pos = 0; pos < 180; pos += 1)  // goes from 0 degrees to 180 degrees 
+  {                                  // in steps of 1 degree 
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    sdelay(20);
+  } 
+  sdelay(100);
+  for(pos = 180; pos>=1; pos-=1)     // goes from 180 degrees to 0 degrees 
+  {                                
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    sdelay(20);
+    SoftwareServo::refresh();
+  } 
+  
 }
 
 void setup() {
@@ -73,13 +112,17 @@ void setup() {
     pinMode( DIR2A      , OUTPUT );
     pinMode( DIR1B      , OUTPUT );
     pinMode( DIR2B      , OUTPUT );
-    fullStop();                     //init's all previous outputs
+                         
+    myservo.attach(HAXXXOR);  // attaches the servo pin
+    initservo();
+    
+    fullStop(); //init's all previous outputs
     
     Serial.begin(USBSERIAL);        // init USB Serial (console)
     Serial1.begin(BTGPSRATE);       // init pin0/1 Serial (bluetooth)
     delay(1234); 
     setupBT(3210);
-    while(readBT() != CMD_STOP);    // safety frist? ¯\(°_o)/¯ I DUNNO LOL
+    while(readBT() != CMD_STOP);    // safety frist? Â¯\(Â°_o)/Â¯ I DUNNO LOL
 }
 
 int runDelay = 0;
